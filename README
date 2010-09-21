@@ -1,0 +1,33 @@
+Description
+--------------------
+A hopefully soon to be series of Munin plugins for displaying Twilio data via Munin
+
+
+Dependencies
+--------------------
+BeautifulSoup - http://www.crummy.com/software/BeautifulSoup/
+python-munin - http://github.com/samuel/python-munin
+Twill - http://twill.idyll.org/
+
+
+Usage
+--------------------
+1) Copy the plugin(s) to your Munin plugins directory
+2) Modify the plugin to use your e-mail and password for Twilio login
+3) Modify your Munin plugin config file to include the plugin
+4) Restart munin-node
+
+
+Notes
+--------------------
+- twilio-balance requires username/password because you can't get your balance via API calls
+
+
+Thoughts
+--------------------
+- Defaulting from 0 -> 500 right now for balance, this may need to change
+
+
+
+Created by Jason Corwin <jsoncorwin@gmail.com>
+

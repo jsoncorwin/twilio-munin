@@ -1,0 +1,71 @@
+#!/usr/bin/python
+# 
+# I should probably throw some type of license in here
+# Hmm...I'm not liable for anything, that should be it for now
+#
+# Created By: Jason Corwin <jsoncorwin@gmail.com>
+# Twitter: @jsoncorwin
+#
+
+
+# For creating munin plugin
+import os
+import re
+from munin import MuninPlugin
+
+# For reading Twilio Website
+from twill import get_browser
+from twill.commands import *
+from BeautifulSoup import BeautifulSoup
+from decimal import Decimal
+
+email = ""
+password = ""
+login_url = "https://www.twilio.com/login?g=/user/account%3F"
+
+class TwilioBalancePlugin(MuninPlugin):	
+	title = "Twilio Balance"
+	args = "--base 1000 -r --lower-limit 0 --upper-limit 500"
+	vlabel = "$"
+	category = "Twilio"
+	period = "second"
+	info = "This graph shows the Twilio account balance"
+
+	@property
+	def fields(self):
+		return [("balance", dict(
+			label = "balance",
+			info = "The balance of the supplied Twilio account",
+			type = "GAUGE",
+			min = "0",
+			))]
+	
+	def execute(self):
+		balance = self.getTwilioBalance()
+		print "balance.value %s" % balance
+		
+
+	def getTwilioBalance(self):
+		redirect_output('/dev/null')
+		b = get_browser()
+		b.go(login_url) # Twilio login URL
+
+		fv("2", "email", email)
+		fv("2", "password", password)
+		submit()
+
+	# Verify that we logged in properly, otherwise exit
+		try:
+			code(200)
+		except:
+			exit
+
+	# Twilio drops us to https://www.twilio.com/user/account/
+
+	# As of the time of this writing, the first span contains the balance
+	# There's no id/name/etc., to find it by otherwise
+		soup = BeautifulSoup(''.join(show()))
+		return Decimal(soup.find('span').string.replace("$",""))
+
+if __name__ == "__main__":
+	TwilioBalancePlugin().run()
